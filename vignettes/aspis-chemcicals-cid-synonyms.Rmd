@@ -1,0 +1,287 @@
+---
+title: "Retrieve PubChem cid and synonyms for each ASPIS compound"
+date: "`r Sys.time()`"
+author: "Marc A.T. Teunis, Ph.D."
+output: 
+  rmdformats::downcute:
+    self_contained: TRUE
+    number_sections: FALSE
+vignette: >
+  %\VignetteIndexEntry{aspis-chemcicals-cid-synonyms}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+This workflow describes how to retrieve information (here PubChem cid and synonyms) for a given compound inchi, using the NCBI Entrez PUG-REST API. 
+
+## Packages
+```{r}
+library(raspis)
+library(tidyverse)
+library(litsearchr)
+library(rentrez)
+library(easyPubMed)
+library(europepmc)
+library(readxl)
+library(webchem)
+# install.packages("googlesheets4")
+library(googlesheets4)
+```
+
+## Documentation
+
+ - [`{rentrez}`](https://cran.r-project.org/web/packages/rentrez/vignettes/rentrez_tutorial.html#finding-cross-references-entrez_link)
+ - [`{webchem}`](https://github.com/ropensci/webchem)
+
+## List of chemicals 
+Here we load the Googlesheet file containing compound info from the ASPIS project cluster for which we will build the query and perform the search. People who have access to the file and have the url to the file, can reproduce the results obtained in this demo.
+
+see for workflow on how to use R to connect to Googlesheets: https://www.r-bloggers.com/2021/12/how-to-connect-r-to-google-sheets-using-googlesheets4/
+
+To initiate the authentication for your Google account run `gs4_auth()` in the Console. You are presented with the option to select an eaxisting google account or to add a new one. You may choose to link the current session to an already cached token (press enter after selecting the apporpriate Google account), or choose '0' to obtain a new token. 
+
+The Googlesheet we are trying to access here is in 'everybody who has the link has access' mode. So we do not need to authenticate. We can use `gs4_deauth()` here, which in this case is safer to use.
+
+The url to the sheet is stored as a cached value, to not show it here in the code. We use the RStudio API to achieve this.
+
+
+```{r}
+gs4_deauth()
+url_sheet <- rstudioapi::askForSecret(name = "url_sheet")
+data_source <- read_sheet(url_sheet)
+data_source
+```
+
+## Clean and select data
+Let's clean up and reduce the amount of data. Steps to take:
+
+ - Clean up variable names to make them unix-safe
+ - The file is not tidy, the columns "Project ID (RISK-HUNT3R)", 
+ "Project ID (ONTOX)", "Project ID (PrecisionTox)", "Used in RISK-HUNT3R", 
+ "Used in ONTOX", "Used in PrecisionTox" contain variables 
+ (`project_id` & `used_in_project`), that are    spread over multiple columns. 
+ Here we will tidy them into 2 columns: `project_id` and `used_in_project`, using the `unite()` function from the `{tidyr}` package.
+
+```{r}
+data_source <- janitor::clean_names(data_source)
+
+names(data_source)
+
+data_source |>
+  mutate(
+    project_id_risk_hunt3r = ifelse(
+      is.na(project_id_risk_hunt3r), 
+      "", 
+      project_id_risk_hunt3r)
+  ) |>
+  mutate(
+    project_id_ontox = ifelse(
+      is.na(project_id_ontox), 
+      "", 
+      project_id_ontox)
+  ) |>
+  mutate(
+    project_id_precision_tox = ifelse(
+      is.na(project_id_precision_tox), 
+      "", 
+      project_id_precision_tox)
+  ) |>
+  tidyr::unite(
+    col = "project_id", 
+    project_id_risk_hunt3r: project_id_precision_tox,
+    sep = "<>" ## add a token to be able to recognize the ids per project
+  ) |> 
+  tidyr::unite(
+    col = "used_in_project", 
+    used_in_risk_hunt3r:used_in_precision_tox,
+    sep = "<>" ## add a token to be able to recognize the values per project
+    ) -> data_source_tidy
+ 
+
+```
+
+## Some checks on duplicates
+```{r}
+data_source_tidy |> 
+  group_by(smiles) |>
+  tally() |>
+  dplyr::filter(n > 1) -> aspis_duplicated_smiles
+aspis_duplicated_smiles
+#usethis::use_data(aspis_duplicated_smiles)
+```
+
+So there are 26 rows that have the same value for  `inchi`.
+
+## Can we see which chemicals are selected in two or more projects
+We know from inspecting the data that the value "RH0106<>CMS-7713<>" in the `project_id` indicates that this compound is selected in both RISKHUNT3R and ONTOX. Let's see which inchi belongs to this compound.
+```{r}
+data_source_tidy |>
+  dplyr::filter(
+    project_id == "RH0106<>CMS-7713<>"
+  ) -> x
+
+x$smiles
+```
+
+Is this one of the duplicates?
+```{r}
+aspis_duplicated_smiles |>
+  dplyr::filter(
+    smiles == x$smiles
+  )
+```
+????
+
+
+
+## Add CID 
+To start with a clean query to PubChem, I will continue with only the unique inchi values for each compound in the ASPIS chemical set.
+```{r}
+data_source_tidy$smiles |> 
+  unique() |>
+  enframe(name = "index", value = "smiles") -> smiles_unique
+smiles_unique
+```
+
+CID is the PubChem id. We need this id for other things.
+```{r, get_cids_from_names, eval=FALSE}
+## get all CID for all chemicals by name
+## wrap get_cid() in function with a pause, not to overburden the NCBI server.
+get_cid_with_pause <- function(..., wait = 0.5){
+  
+  x <- get_cid(...)
+  profvis::pause(wait)
+  return(x)
+  
+}
+
+hold = 2
+
+smiles_cid <- smiles_unique |>
+  mutate(
+    cid = map(
+    .x = smiles,
+    get_cid_with_pause,
+    verbose = TRUE,
+    from = 'smiles',
+    wait = hold)
+  )
+#usethis::use_data(smiles_cid)
+
+smiles_cid_tidy <- smiles_cid |>
+  unnest(cid) %>%
+  dplyr::select(-query)
+
+## store dataset in package
+#usethis::use_data(smiles_cid_tidy, overwrite = TRUE)
+```
+
+## Check cid for missingness and uniqueness
+```{r}
+## load datset from package
+data(package = "raspis", "smiles_cid_tidy")
+## are there inchi values that did not match to any CID?
+smiles_cid_tidy$cid |>
+  is.na() |>
+  sum()
+
+naniar::vis_miss(smiles_cid_tidy)
+
+## is every cid matched to a unique cid?
+smiles_cid_tidy |>
+  group_by(smiles) |>
+  tally() |>
+  dplyr::filter(n >1) -> x
+x$n
+```
+
+From the code above we can conclude that:
+
+ 1. There are  missing cid. This means that for values of `inchi` a matching cid was not returned from the PubChem database. What this means for the project, remains to be seen.
+ 2. Each value for `cid` has a matching unique value for `smiles`. This is to be expected as cid and smiles are both resolvable ids.
+
+## Enrich compound data with synonyms 
+No we add synonyms to each row that we have a cid for. To reduce the number of queries, we use only the complete records (that have an inchi and a cid).
+See [PUG-REST API PubChem](https://pubchemdocs.ncbi.nlm.nih.gov/pug-rest) for all attributes that can be retrieved.  
+```{r, get_synonyms_and_inchi_from_names, eval=FALSE}
+get_synonyms_with_pause <- function(..., wait = 0.5){
+  
+  x <- pc_synonyms(...)
+  profvis::pause(wait)
+  return(x)
+  
+}
+
+hold = 2
+
+smiles_cid_synonyms <- smiles_cid_tidy |>
+  na.omit() |>
+  mutate(
+    synonyms = map(
+      cid,
+      get_synonyms_with_pause,
+      from = "cid",
+      wait = hold, 
+      verbose = TRUE)) 
+
+#usethis::use_data(smiles_cid_synonyms)
+
+smiles_cid_synonyms_tidy <- smiles_cid_synonyms |>
+  unnest_longer(synonyms) |>
+  unnest_longer(synonyms)
+## write as dataset to package
+#usethis::use_data(smiles_cid_synonyms_tidy)
+
+```
+
+## Result
+```{r, include=FALSE, eval=TRUE}
+library(raspis)
+
+#pubminer::data_ASPIS_with_cid 
+data(
+  package = "raspis", 
+  dataset = "smiles_cid_synonyms_tidy"
+  )
+```
+
+```{r, eval=TRUE}
+smiles_cid_synonyms_tidy |> head(5)
+```
+
+## Create merged dataset with source
+```{r, include=FALSE}
+smiles_cid_synonyms <- smiles_cid_synonyms |>
+  dplyr::select(-c(index))
+
+merged_source_cid_synonyms <- left_join(
+  data_source_tidy,
+  smiles_cid_synonyms
+) |>
+  unnest_longer(synonyms)
+
+#usethis::use_data(merged_source_cid_synonyms)
+
+merged_source_cid_synonyms_tidy <- left_join(
+  data_source_tidy,
+  smiles_cid_synonyms
+) |>
+  unnest_longer(synonyms) |>
+  unnest_longer(synonyms)
+
+#usethis::use_data(merged_source_cid_synonyms_tidy)
+```
+
+```{r, include=FALSE, eval=FALSE}
+gs4_auth()
+googlesheets4::write_sheet(
+  data = merged_source_cid_synonyms, 
+  ss = "https://drive.google.com/drive/folders/1CEHJ6ES_9eSc5i41pqGgAc518uutWdDO?usp=sharing", 
+  sheet = "merged_source_cid_synonyms")
+```
+

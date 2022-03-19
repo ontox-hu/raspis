@@ -1,0 +1,25 @@
+Package: raspis
+Title: The ASPIS Cluster chemical collection dataset
+Version: 0.0.1
+Authors@R: 
+    person("Marc", "Teunis", , "marc.teunis@hu.nl", role = c("aut", "cre"),
+           comment = c(ORCID = "https://orcid.org/0000-0002-3496-6669"))
+Description: This package contains a collection of datasets including 
+    compound information collected in the ASPIS project cluster.
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Imports: 
+    dplyr,
+    magrittr,
+    tidyr,
+    webchem
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+Depends: 
+    R (>= 4.0.0)
+LazyData: true
