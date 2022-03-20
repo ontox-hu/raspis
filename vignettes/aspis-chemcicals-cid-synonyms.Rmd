@@ -13,11 +13,26 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  error = FALSE
+  )
 ```
 
 ## Introduction
-This workflow describes how to retrieve information (here PubChem cid and synonyms) for a given compound inchi, using the NCBI Entrez PUG-REST API. 
+This workflow describes how to retrieve information (here PubChem cid and synonyms) for a given compound inchi, using the NCBI Entrez PUG-REST API. This vignette was also used to create these datsets in the `{raspis}` package:
+
+ 1. merged_source_cid_synonyms
+ 2. merged_source_cid_synonyms_tidy
+ 3. smiles_cid           
+ 4. smiles_cid_synonyms
+ 5. smiles_cid_synonyms_tidy
+ 6. smiles_cid_tidy  
+ 7. data_source
+
+See `?raspis::dataset_name` for more info
 
 ## Packages
 ```{r}
@@ -50,11 +65,16 @@ The Googlesheet we are trying to access here is in 'everybody who has the link h
 The url to the sheet is stored as a cached value, to not show it here in the code. We use the RStudio API to achieve this.
 
 
-```{r}
+```{r, include=FALSE}
 gs4_deauth()
-url_sheet <- rstudioapi::askForSecret(name = "url_sheet")
+#url_sheet <- rstudioapi::askForSecret(name = "url_sheet")
+url_sheet <- c("https://docs.google.com/spreadsheets/d/1SGuP6FfUzIe0hzEeu_BlTFujZ4lRUxgBTOi3j5MNamU/edit?usp=sharing")
+```
+
+```{r}
 data_source <- read_sheet(url_sheet)
 data_source
+#usethis::use_data(data_source)
 ```
 
 ## Clean and select data
@@ -263,9 +283,10 @@ merged_source_cid_synonyms <- left_join(
   data_source_tidy,
   smiles_cid_synonyms
 ) |>
-  unnest_longer(synonyms)
+  unnest_longer(synonyms) |>
+  dplyr::select(-c(synonyms_id))
 
-#usethis::use_data(merged_source_cid_synonyms)
+usethis::use_data(merged_source_cid_synonyms, overwrite = TRUE)
 
 merged_source_cid_synonyms_tidy <- left_join(
   data_source_tidy,

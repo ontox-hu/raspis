@@ -1,11 +1,20 @@
-# aspis-compounds
-This is the repo for writing code and workflows to work with the complete ASPIS compound dataset. This is an R package containing the ASPIS chemcials as a dataset
+# `{raspis}` R package
+This is an R package containing the ASPIS chemicals as a collection of datasets that can be read directly into R from this package. To learn more follow the instructions below. ASPIS is a cluster of three EU Horizon 2020 funded projects directed to toxicology. The cluster consists of:
+
+ 1. [RISK-HUNT3R](https://www.risk-hunt3r.eu/)
+ 2. [ONTOX](https://ontox-project.eu/)
+ 3. [PrecisionTox](https://precisiontox.org/)
+ 
+ Follow the [link](https://www.aspis-cluster.com/) for more information on ASPIS. 
+
+To use the data sets you can install `{raspis}` in R.
 
 ## Installation
 Run the following commands in R
 ```
 install.packages("remotes")
 remotes::install_github("ontox-hu/raspis")
+library(raspis)
 ```
 
 To see all the datasets:
@@ -20,7 +29,8 @@ data(package = "raspis", dataset = <dataset_name>)
 
 To see the documentation:
 ```
+library(raspis)
 browseVignettes("raspis")
 ```
 
-To see more details on the package visit the `{pkgdown}` website
+To see more details on the package visit the [`{raspis}` Github page](https://github.com/ontox-hu/raspis/)

@@ -1,13 +1,15 @@
 Package: raspis
-Title: The ASPIS Cluster chemical collection dataset
+Title: The ASPIS Cluster chemical collection datasets
 Version: 0.0.1
 Authors@R: 
     person("Marc", "Teunis", , "marc.teunis@hu.nl", role = c("aut", "cre"),
            comment = c(ORCID = "https://orcid.org/0000-0002-3496-6669"))
 Description: This package contains a collection of datasets including 
-    compound information collected in the ASPIS project cluster.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    compound information collected in the ASPIS project cluster. 
+    See [ASPIS](https://www.aspis-cluster.com/) for more details on this 
+    cluster of the three EU Horizon 2020 Toxicology projects: 
+    RISK-HUNT3R, ONTOX and PrecisionTox.
+License: CC BY 4.0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
