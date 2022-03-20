@@ -24,7 +24,8 @@ Suggests:
     janitor,
     tibble,
     rmdformats,
-    naniar
+    naniar,
+    googlesheets4
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.0.0)
