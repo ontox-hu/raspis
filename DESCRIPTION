@@ -22,7 +22,11 @@ Suggests:
     knitr,
     rmarkdown,
     janitor,
-    tibble
+    tibble,
+    rmdformats,
+    naniar,
+    googlesheets4,
+    usethis
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.0.0)

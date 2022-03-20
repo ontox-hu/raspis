@@ -1,3 +1,5 @@
+# raspis <img src="man/figures/logo.png" align="right" />
+
 ## The `{raspis}` R package
 This is an R package containing the ASPIS chemicals as a collection of datasets that can be read directly into R from this package. To learn more follow the instructions below. To use the data sets you can install `{raspis}` in R.
 
