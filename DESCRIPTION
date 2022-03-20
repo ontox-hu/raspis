@@ -16,11 +16,13 @@ RoxygenNote: 7.1.2
 Imports: 
     dplyr,
     magrittr,
-    tidyr,
-    webchem
-Suggests: 
+    tidyr
+Suggests:
+    webchem,
     knitr,
-    rmarkdown
+    rmarkdown,
+    janitor,
+    tibble
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.0.0)

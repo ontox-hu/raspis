@@ -1,0 +1,25 @@
+---
+title: "Frequently Asked Questions"
+date: "`r Sys.time()`"
+author: "Marc A.T. Teunis, Ph.D."
+output: 
+  rmdformats::downcute:
+    self_contained: TRUE
+    number_sections: FALSE
+vignette: >
+  %\VignetteIndexEntry{faq}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## What are SMILES?
+
+## What does 'INCHI' mean?
+
+## What are typical use cases for the data in the `{aspis}` package?
+
+## What does 'tidy' mean? 

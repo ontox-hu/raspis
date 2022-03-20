@@ -3,7 +3,7 @@
 \docType{data}
 \name{merged_source_cid_synonyms}
 \alias{merged_source_cid_synonyms}
-\title{Data set on compound from the ASPIS cluster of projects,
+\title{Data set on compounds from the ASPIS cluster of projects,
 enriched for PubChem CID en compound synonyms}
 \format{
 A data frame with 790 rows and 12 variables:
@@ -29,7 +29,7 @@ A data frame with 790 rows and 12 variables:
 merged_source_cid_synonyms
 }
 \description{
-A dataset containing information (ids) on 790 compounds, collected
+A data set containing information (ids) on 790 compounds, collected
 from three Horizon 2020 projects (RISK-HUNT3R, ONTOX and PrecisionTox),
 organized under an umbrella organization called ASPIS.
 See \href{https://www.aspis-cluster.com/}{ASPIS} for more details on ASPIS.
@@ -37,7 +37,7 @@ See \href{https://www.aspis-cluster.com/}{ASPIS} for more details on ASPIS.
 \details{
 This data set is an enriched version of dataset "data_source"
 also available in \code{{raspis}}. The data was enriched with PubChem CID and
-compound synonyms, obtained via the NCBI PUG-REST API)
+compound synonyms, obtained via the NCBI PUG-REST API).
 Steps taken to do this enrichment are described in the package
 Vignette. Run \code{browseVignettes(package = "raspis")} to see
 the Vignette(s). There is also a tidy version of this data set available

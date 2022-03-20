@@ -37,13 +37,11 @@ See `?raspis::dataset_name` for more info
 ## Packages
 ```{r}
 library(raspis)
-library(tidyverse)
-library(litsearchr)
-library(rentrez)
-library(easyPubMed)
-library(europepmc)
-library(readxl)
+library(tidyr)
+library(dplyr)
+library(janitor)
 library(webchem)
+library(tibble)
 # install.packages("googlesheets4")
 library(googlesheets4)
 ```

@@ -1,9 +1,15 @@
-## build command
+.update_raspis <- function(){
 
-devtools::document()
-pkgdown::build_site(".")
-#devtools::build(".")
-devtools::install(".")
+  ## update documentation
+  devtools::document()
 
-## deploy to RSConnect
-rsconnect::deployApp("./docs", account = "mteunis")
+  ## build package
+  devtools::install(".")
+
+  ## update pkgdown
+  pkgdown::build_site(".")
+
+  ## deploy to RSConnect
+  rsconnect::deployApp("./docs", account = "mteunis")
+
+}
