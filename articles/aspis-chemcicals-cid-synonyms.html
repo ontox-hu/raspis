@@ -71,7 +71,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Retrieve PubChem cid and synonyms for each ASPIS compound</h1>
                         <h4 data-toc-skip class="author">Marc A.T. Teunis, Ph.D.</h4>
             
-            <h4 data-toc-skip class="date">2022-03-20 13:52:42</h4>
+            <h4 data-toc-skip class="date">2022-03-20 18:20:49</h4>
       
       
       <div class="d-none name"><code>aspis-chemcicals-cid-synonyms.Rmd</code></div>
@@ -245,7 +245,7 @@
 <span class="co">##   smiles                                                                       n</span>
 <span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                                                    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
 <span class="co">## <span style="color: #BCBCBC;">1</span> C[C@@H]1[C@H]2[C@@H]([C@H]3[C@@H](C(=O)C(=C([C@]3(C(=O)C2=C(C4=C1C=CC=C…     2</span></code></pre>
-<p>????</p>
+<p>Yes, it is! So duplicates were introduced in the source, because there are chemicals that are in in more then 1 project.</p>
 </div>
 <div class="section level2">
 <h2 id="add-cid">Add CID<a class="anchor" aria-label="anchor" href="#add-cid"></a>
@@ -326,7 +326,7 @@
 <pre><code><span class="co">## integer(0)</span></code></pre>
 <p>From the code above we can conclude that:</p>
 <ol style="list-style-type: decimal">
-<li>There are missing cid. This means that for values of <code>inchi</code> a matching cid was not returned from the PubChem database. What this means for the project, remains to be seen.</li>
+<li>There are missing cid. This means that for values of <code>smiles</code> a matching cid was not returned from the PubChem database. What this means for the project, remains to be seen.</li>
 <li>Each value for <code>cid</code> has a matching unique value for <code>smiles</code>. This is to be expected as cid and smiles are both resolvable ids.</li>
 </ol>
 </div>
