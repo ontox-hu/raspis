@@ -22,7 +22,9 @@ Suggests:
     knitr,
     rmarkdown,
     janitor,
-    tibble
+    tibble,
+    rmdformats,
+    naniar
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.0.0)
